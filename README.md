@@ -4,6 +4,12 @@
 
 [README](https://github.com/XTLS/Xray-core#readme) is open, so feel free to submit your project [here](https://github.com/XTLS/Xray-core/pulls).
 
+## Fork-specific TLS behavior
+
+This fork restores the TLS `allowInsecure` option. When neither `pinnedPeerCertSha256` nor `verifyPeerCertByName` is configured, peer certificate verification is disabled by default for compatibility with clients that remove `allowInsecure` from generated Xray configurations.
+
+**Security warning:** disabling certificate verification permits man-in-the-middle attacks. Use `pinnedPeerCertSha256` or `verifyPeerCertByName` whenever the server provides a verifiable identity, especially on untrusted networks.
+
 ## Sponsors
 
 [![Remnawave](https://github.com/user-attachments/assets/a22d34ae-01ee-441c-843a-85356748ed1e)](https://docs.rw)

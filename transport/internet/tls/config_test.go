@@ -8,6 +8,7 @@ import (
 
 	"github.com/xtls/xray-core/common"
 	"github.com/xtls/xray-core/common/protocol/tls/cert"
+	"github.com/xtls/xray-core/common/serial"
 	. "github.com/xtls/xray-core/transport/internet/tls"
 )
 
@@ -70,6 +71,30 @@ func TestInsecureCertificates(t *testing.T) {
 	tlsConfig := c.GetTLSConfig()
 	if len(tlsConfig.CipherSuites) > 0 {
 		t.Fatal("Unexpected tls cipher suites list: ", tlsConfig.CipherSuites)
+	}
+}
+
+func TestAllowInsecure(t *testing.T) {
+	typedConfig := serial.ToTypedMessage(&Config{AllowInsecure: true})
+	instance, err := typedConfig.GetInstance()
+	if err != nil {
+		t.Fatal(err)
+	}
+	tlsConfig := instance.(*Config).GetTLSConfig()
+	if !tlsConfig.InsecureSkipVerify {
+		t.Fatal("allowInsecure did not disable peer certificate verification")
+	}
+}
+
+func TestAllowInsecureByDefault(t *testing.T) {
+	typedConfig := serial.ToTypedMessage(&Config{})
+	instance, err := typedConfig.GetInstance()
+	if err != nil {
+		t.Fatal(err)
+	}
+	tlsConfig := instance.(*Config).GetTLSConfig()
+	if !tlsConfig.InsecureSkipVerify {
+		t.Fatal("peer certificate verification was not disabled by default")
 	}
 }
 

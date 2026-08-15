@@ -8,6 +8,7 @@ import (
 	. "github.com/xtls/xray-core/infra/conf"
 	"github.com/xtls/xray-core/transport/internet"
 	finalmaskcustom "github.com/xtls/xray-core/transport/internet/finalmask/header/custom"
+	"github.com/xtls/xray-core/transport/internet/tls"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -157,6 +158,39 @@ func TestSocketConfig(t *testing.T) {
 	if expectedOutput.ParseTFOValue() != -1 {
 		t.Fatalf("unexpected parsed TFO value, which should be -1")
 	}
+}
+
+func TestTLSConfigAllowInsecure(t *testing.T) {
+	parser := loadJSON(func() Buildable { return new(TLSConfig) })
+	zeroHash := make([]byte, 32)
+
+	runMultiTestCase(t, []TestCase{
+		{
+			Input:  `{}`,
+			Parser: parser,
+			Output: &tls.Config{AllowInsecure: true},
+		},
+		{
+			Input:  `{"allowInsecure": false}`,
+			Parser: parser,
+			Output: &tls.Config{AllowInsecure: true},
+		},
+		{
+			Input:  `{"allowInsecure": true}`,
+			Parser: parser,
+			Output: &tls.Config{AllowInsecure: true},
+		},
+		{
+			Input:  `{"verifyPeerCertByName": "example.com"}`,
+			Parser: parser,
+			Output: &tls.Config{VerifyPeerCertByName: []string{"example.com"}},
+		},
+		{
+			Input:  `{"pinnedPeerCertSha256": "0000000000000000000000000000000000000000000000000000000000000000"}`,
+			Parser: parser,
+			Output: &tls.Config{PinnedPeerCertSha256: [][]byte{zeroHash}},
+		},
+	})
 }
 
 func TestHeaderCustomUDPBuild(t *testing.T) {

@@ -387,6 +387,7 @@ func (c *Config) GetTLSConfig(opts ...Option) *tls.Config {
 		Rand:                   randCarrier,
 		ClientSessionCache:     globalSessionCache,
 		RootCAs:                root,
+		InsecureSkipVerify:     c.AllowInsecure || (len(c.VerifyPeerCertByName) == 0 && len(c.PinnedPeerCertSha256) == 0),
 		NextProtos:             slices.Clone(c.NextProtocol),
 		SessionTicketsDisabled: !c.EnableSessionResumption,
 		VerifyPeerCertificate:  randCarrier.verifyPeerCert,
