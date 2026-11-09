@@ -18,7 +18,10 @@ on:
 
 jobs:
   build-and-push:
-    if: (github.event.action != 'published') || (github.event.action == 'published' && github.event.release.prerelease == true)
+    # Darwin-only releases must not publish Linux container images.
+    if: >-
+      ${{ !endsWith(github.event.release.tag_name, '-darwin') &&
+      ((github.event.action != 'published') || (github.event.action == 'published' && github.event.release.prerelease == true)) }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
